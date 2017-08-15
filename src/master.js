@@ -11,7 +11,6 @@ var master = {
 		***************/
 		this.wipeMemory();
 		this.initializeMemory();
-		gameController.scanAllRooms();
 	},
 
 	wipeMemory: function () 
@@ -57,14 +56,14 @@ var master = {
 
 				if(!room.memory.DEFCON)
 				{
-					room.memory.DEFCON = 3;
+					room.memory.DEFCON = 5; // Safe -- will be scanned and updated anyway
 				}
 
 				if (!room.memory.environment || !room.memory.environment.energySourcesArray)
 				{
 					room.memory.environment = {
 						terrainMapArray: [],
-						energySourcesArray: {},
+						energySourcesArray: [],
 						mineralsArray: []
 					};
 				}
@@ -77,7 +76,8 @@ var master = {
 							RightDown: {x: 0, y: 0},
 							LeftUp: {x: 0, y: 0},
 							LeftDown: {x: 0, y: 0}
-						}
+						},
+						roadPlanner: []
 					};
 				}
 
@@ -177,6 +177,14 @@ var master = {
 				}
 				room.memory.structures.mapArray = structuresMapArray;
 			}
+		}
+	},
+
+	reinitializeMemory: function()
+	{
+		for (var roomName in Game.rooms){
+			var room = Game.rooms[roomName];
+			room.memory.initialized = false;
 		}
 	},
 
