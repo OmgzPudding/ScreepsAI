@@ -1,5 +1,5 @@
 
-
+var constructionController = require('Controllers_constructionController');
 
 var roomController = {
 	go: function(room) 
@@ -26,15 +26,32 @@ var roomController = {
 
 
 		*/
+		/************
+			ROOM SCANNING IS DONE BEFORE THE ROOM_CONTROLLER IS STARTED
+		************/
 
+		constructionController.updateRoadPlanning(room);
+
+		if (Game.time % 20 == 0){
+			constructionController.createRoadHeatMap(room);
+		}
 
 	},
 
+	/*******************
+		SCANNING SECTION
+
+	*******************/
+
 	scanRoom: function(room)
 	{
+		// These are done only the first time
 		this.scanTerrain(room);
 		this.scanMinerals(room);
 		this.scanEnergy(room);
+
+		// This is done every turn
+		this.scanEnemies(room);
 	},
 
 	scanTerrain: function(room)
@@ -92,6 +109,7 @@ var roomController = {
 
 	scanEnergy: function(room)
 	{
+		// Get the basic Energy Source info initially. It can be updated later much more easily
 		if (Object.keys(room.memory.environment.energySourcesArray).length == 0){
 
 			console.log('Scanning energy for room '+room.name);
@@ -120,7 +138,10 @@ var roomController = {
 				}
 
 
-				room.memory.environment.energySourcesArray[sourceId] = {
+				var source = {
+					'id':  					allEnergy[i].id,
+					'x': 					allEnergy[i].pos.x,
+					'y': 					allEnergy[i].pos.y,
 					'maxEnergy': 			allEnergy[i].energyCapacity,
 					'currentEnergy': 		allEnergy[i].energy,
 					'adjacentSpots': 		adjacentSpots
@@ -133,7 +154,53 @@ var roomController = {
 			}
 
 		}
-	}
+	},
+
+	scanEnemies: function(room)
+	{
+		var enemies = room.find(FIND_HOSTILE_CREEPS);
+		var n = enemies.length;
+		var defcon = 5;
+		
+		if (n >= 10){ // 10+
+			defcon = 1;
+		}
+		else if (n >= 6){ // 6-9
+			defcon = 2;
+		}
+		else if (n >= 3){ // 3-6
+			defcon = 3;
+		}
+		else if (n > 0){ // 1-2
+			defcon = 4;
+		}
+
+		// Update the room status in memory
+		room.memory.DEFCON = defcon;
+	},
+
+	/*************************
+		END SCANNING SECTION
+
+	*************************/
+
+	lookForCreepAt(x, y, room)
+	{
+		// Takes coordinates and a room, returns true if a friendly creep is found there
+		// returns false if no creep is found
+
+		var creepList = room.find(FIND_MY_CREEPS);
+		var found = false;
+		for (var c in creepList){
+			if ((creepList[c].pos.x == x) && (creepList[c].pos.y == y)){
+				found = true;
+				break;
+			}
+		}
+
+		return found;
+	},
+
 };
 
 module.exports = roomController;

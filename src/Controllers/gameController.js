@@ -4,6 +4,10 @@ var roomController = require('Controllers_roomController');
 var gameController = {
 	go: function ()
 	{
+		// It may be useful to have all of the terrain/resource data before
+		// each room is handled separately
+		this.scanAllRooms();
+
 		for (var roomName in Game.rooms){
 			var room = Game.rooms[roomName];
 			roomController.go(room);
