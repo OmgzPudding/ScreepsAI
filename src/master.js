@@ -94,14 +94,11 @@ var master = {
 							supplyStorage: {},
 							supplyTower: {}
 						},
-						workerJobBoard: {
-							firstPriorityJobs: {
-								buildStructure: {}
-							},
-							routineJobs: {
-								repairWall: {},
-								repairStructure: {}
-							}
+						constructionJobBoard: {
+							buildStructure: {},
+							repairWall: {},
+							repairStructure: {}
+							
 						},
 						haulerJobBoard: {
 							collectDroppedEnergy: {},
@@ -112,7 +109,7 @@ var master = {
 
 							manageStorageAndTerminal: {},
 							harvestEnergy: {},
-							harvestResource: {}
+							harvestMineral: {}
 						}
 					};
 					let stationaryJobSitesMapArray = new Array();
@@ -193,7 +190,7 @@ var master = {
 	execute: function()
 	{
 		/***************
-		 After perp work is done, move on to the GAME_CONTROLLER to continues
+		 After prep work is done, move on to the GAME_CONTROLLER to continue
 
 		***************/
 		gameController.go();

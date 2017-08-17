@@ -1,6 +1,4 @@
 
-var roomController = require('Controllers_roomController');
-
 var constructionController = {
 	
 	/***************************
@@ -25,6 +23,7 @@ var constructionController = {
 				for (var y = 0; y < 50; y++){
 					planner[x][y] = {
 						'initTime': null, 	// Will record Game.time when first creep steps on tile
+						'lastUpdate':null,  // Records Game.time on last time it was updated
 						'usage': 0,			// Will contain a running value of usage
 						'road': false		// If usage > threshold, road = true, request road construction
 					}
@@ -33,42 +32,38 @@ var constructionController = {
 		}
 		else {
 			var planner = room.memory.construction.roadPlanner;
-			for (var x = 0; x < planner.length; x++){
-				for (var y = 0; y < planner[x].length; y++){
-					var tile = planner[x][y];
+			var creepList = room.find(FIND_MY_CREEPS);
 
-					if (roomController.lookForCreepAt(x, y, room)){
-						// Creep found on this square
-						if (!tile.initTime || tile.initTime == null){
-							tile.initTime = Game.time; // initialize initTime
-						}
+			for (var i in creepList){
+				var creep = creepList[i];
+				var x = creep.pos.x;
+				var y = creep.pos.y;
 
-						tile.usage++; // increment usage
+				if (!planner[x][y]['initTime'] || planner[x][y]['initTime'] == null){
+					planner[x][y]['initTime'] = Game.time;
+					planner[x][y]['lastUpdate'] = Game.time;
+				}
 
-					}
-					
-					if (tile.initTime || tile.initTime > 0){ // has been initialized before
-						var timePassed = (Game.time - tile.initTime);
-						if (timePassed % 100 == 0 && tile.usage > 0 && tile.initTime != Game.time){
-							tile.usage--; // Decrement every 100 ticks after initializing
-						}
+				if ((Game.time - planner[x][y]['lastUpdate']) > 1000){
+					// Last update over 1000 ticks ago... nullify data
+					planner[x][y]['usage'] = 0;
+					planner[x][y]['road'] = false;
+				}
+				else {
+					planner[x][y]['usage']++;
+				}
+				
+				planner[x][y]['lastUpdate'] = Game.time; // Record update time
 
-						/*********************************************
-								THIS MAY REQUIRE TWEAKING
-						*********************************************/
+				var age = Game.time - planner[x][y]['initTime'];
+				
+				if (age > 100){
+					// Only becomes a candidate for road creation 100 ticks after first step on tile
+					var roadThreshold = 15; //15% usage
+					var usage = ((planner[x][y]['usage'] / age)*100);
 
-						if (tile.usage > 20 && tile.road == false){
-							tile.road = true;
-							this.requestConstruction(x, y, room, STRUCTURE_ROAD);
-							// request road construction here
-
-						}
-						else if (tile.usage < 5 && tile.road == true){
-							tile.road = false;
-
-							// when assigning jobs, it must check if the road is supposed to be there,
-							// or if it is allowed to decay to nothing
-						}
+					if (usage > roadThreshold){
+						this.requestConstruction(x, y, room, STRUCTURE_ROAD);
 					}
 				}
 			}
