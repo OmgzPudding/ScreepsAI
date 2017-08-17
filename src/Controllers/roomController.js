@@ -144,12 +144,13 @@ var roomController = {
 					'y': 					allEnergy[i].pos.y,
 					'maxEnergy': 			allEnergy[i].energyCapacity,
 					'currentEnergy': 		allEnergy[i].energy,
-					'adjacentSpots': 		adjacentSpots
+					'spots': 				adjacentSpots,
+					'miners': 				new Array(adjacentSpots)
 				};
 
-				for (var i = 0; i < adjacentSpots; i++){
-					room.memory.environment.energySourcesArray[sourceId]['miner'+(i+1)] = 'none';
-				}
+//				for (var i = 0; i < adjacentSpots; i++){
+//					room.memory.environment.energySourcesArray[sourceId]['miner'+(i+1)] = 'none';
+//				}
 
 			}
 
