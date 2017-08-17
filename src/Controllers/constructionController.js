@@ -29,6 +29,8 @@ var constructionController = {
 					}
 				}
 			}
+			room.memory.construction.roadPlanner = planner;
+
 		}
 		else {
 			var planner = room.memory.construction.roadPlanner;
@@ -84,8 +86,12 @@ var constructionController = {
 			output += "<tr>";
 
 			for (var x = 0; x < 50; x++){
-				var tile = planner[x][y];
-				output += td(tile.usage);
+				if (planner[x][y]){
+					output += td(planner[x][y]['usage']);
+				}
+				else {
+					output += td(0);
+				}
 
 			}
 

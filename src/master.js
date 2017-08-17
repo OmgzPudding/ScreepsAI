@@ -89,6 +89,7 @@ var master = {
 							reserveController: {}
 						},
 						generalJobBoard: {
+							supply: {},
 							supplyExtension: {},
 							supplySpawn: {},
 							supplyStorage: {},
@@ -105,7 +106,7 @@ var master = {
 							moveEnergyFromContainer: {}
 						},
 						stationaryJobBoard: {
-							mapArray: [],
+							//mapArray: [],
 
 							manageStorageAndTerminal: {},
 							harvestEnergy: {},

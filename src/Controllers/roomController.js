@@ -1,5 +1,8 @@
 
 var constructionController = require('Controllers_constructionController');
+var jobManager = require('Controllers_jobManager');
+var spawnController = require('Controllers_spawnController');
+var creepController = require('Controllers_creepController');
 
 var roomController = {
 	go: function(room) 
@@ -32,9 +35,21 @@ var roomController = {
 
 		constructionController.updateRoadPlanning(room);
 
-		if (Game.time % 20 == 0){
+		if (Game.time % 300 == 0){
 			constructionController.createRoadHeatMap(room);
 		}
+
+		jobManager.scanJobs(room);
+
+		spawnController.spawnCreeps(room);
+
+
+		var creeps = room.find(FIND_MY_CREEPS);
+
+		for (var i in creeps){
+			creepController.run(creeps[i]);
+		}
+		
 
 	},
 
@@ -110,7 +125,7 @@ var roomController = {
 	scanEnergy: function(room)
 	{
 		// Get the basic Energy Source info initially. It can be updated later much more easily
-		if (Object.keys(room.memory.environment.energySourcesArray).length == 0){
+		if (room.memory.environment.energySourcesArray.length == 0){
 
 			console.log('Scanning energy for room '+room.name);
 
@@ -148,12 +163,14 @@ var roomController = {
 					'miners': 				new Array(adjacentSpots)
 				};
 
+				energyArray.push(source);
+
 //				for (var i = 0; i < adjacentSpots; i++){
 //					room.memory.environment.energySourcesArray[sourceId]['miner'+(i+1)] = 'none';
 //				}
 
 			}
-
+			room.memory.environment.energySourcesArray = energyArray;
 		}
 	},
 
